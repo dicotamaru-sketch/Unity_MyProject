@@ -13,7 +13,9 @@ Unity 6000.4.0f1 の 2D WebGL ゲームです。
   -executeMethod WebGLBuilder.BuildGitHubPages
 ```
 
-Build output is written to `docs/`, which is deployed to GitHub Pages by `.github/workflows/pages.yml`.
+Build output is written to `docs/`.
+
+GitHub Pages is configured to publish from the `main` branch's `/docs` folder.
 
 ## Play
 
