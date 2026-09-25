@@ -37,30 +37,34 @@ namespace FlowGame
             canvasGO.AddComponent<GraphicRaycaster>();
 
             guidanceText = CreateText(canvasGO.transform, "Guidance",
-                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -24f),
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(0f, -20f), new Vector2(-400f, 60f),
                 24, TextAnchor.UpperCenter, new Color(1f, 1f, 1f, 0.85f));
 
             strokesText = CreateText(canvasGO.transform, "Strokes",
-                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(140f, -24f),
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(24f, -20f), new Vector2(300f, 40f),
                 22, TextAnchor.UpperLeft, new Color(1f, 1f, 1f, 0.85f));
 
             stateText = CreateText(canvasGO.transform, "StateMessage",
-                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                Vector2.zero, new Vector2(700f, 60f),
                 34, TextAnchor.MiddleCenter, Color.white);
 
             CreateRestartButton(canvasGO.transform);
         }
 
         private Text CreateText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax,
-            Vector2 anchoredPos, int fontSize, TextAnchor align, Color color)
+            Vector2 pivot, Vector2 anchoredPos, Vector2 sizeDelta, int fontSize, TextAnchor align, Color color)
         {
             GameObject go = new GameObject(name);
             go.transform.SetParent(parent, false);
             RectTransform rt = go.AddComponent<RectTransform>();
             rt.anchorMin = anchorMin;
             rt.anchorMax = anchorMax;
+            rt.pivot = pivot;
             rt.anchoredPosition = anchoredPos;
-            rt.sizeDelta = new Vector2(700, 60);
+            rt.sizeDelta = sizeDelta;
 
             Text t = go.AddComponent<Text>();
             t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
