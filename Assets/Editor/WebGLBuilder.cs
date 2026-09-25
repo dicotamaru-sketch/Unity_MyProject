@@ -20,7 +20,7 @@ public static class WebGLBuilder
 
         BuildPlayerOptions options = new BuildPlayerOptions
         {
-            scenes = new[] { "Assets/Scenes/SampleScene.unity" },
+            scenes = new[] { "Assets/Scenes/FlowScene.unity" },
             locationPathName = BuildPath,
             target = BuildTarget.WebGL,
             options = BuildOptions.None
