@@ -15,6 +15,10 @@ namespace FlowGame
         private Vector2 lastWorldPos;
         private float lastSampleTime;
 
+        public bool IsDragging => isDragging;
+        public Vector2 DragWorldPos => lastWorldPos;
+        public Vector2 DragWorldVelocity { get; private set; }
+
         public void Setup(FlowSimulation sim, Camera camera)
         {
             simulation = sim;
@@ -66,6 +70,7 @@ namespace FlowGame
 
                 simulation.ApplyDragSample(worldPos, velocity, Time.deltaTime);
 
+                DragWorldVelocity = Vector2.Lerp(DragWorldVelocity, velocity, 0.5f);
                 lastWorldPos = worldPos;
                 lastSampleTime = Time.unscaledTime;
             }
@@ -73,6 +78,7 @@ namespace FlowGame
             if (releasedThisFrame && isDragging)
             {
                 isDragging = false;
+                DragWorldVelocity = Vector2.zero;
                 bool validStroke = dragPathLength >= MinStrokeDistance;
                 simulation.EndDrag(validStroke);
             }

@@ -16,6 +16,24 @@ Unity 6000.4.0f1 の 2D WebGL ゲームです。
 `FlowInputController.cs` が入力、`FlowRenderer.cs` が描画、`FlowUIController.cs` がUI、
 `FlowBootstrap.cs` が起動時の配線）。シーンは `Assets/Scenes/FlowScene.unity`。
 
+### 描画（Phase 1・2）
+
+- `Assets/Resources/Shaders/FlowTrail.shader`: 軌跡の加算合成。uv.x=共鳴値、uv.y=減衰。HDR強度で Bloom に乗る。
+- `Assets/Resources/Shaders/FlowFeedback.shader` + `FlowFeedback.cs`: 残像バッファ。前フレームを
+  シミュレーションと同じリング流れ場で移流させ減衰し、今フレームの軌跡を加える。
+  クリア時は減衰停止（構図が固定）、失敗時は減衰加速（流れがほどける）。
+- `FlowBootstrap.cs` が実行時に URP Volume（Bloom・ACES）を生成し、カメラの Post Processing を有効化する。
+- レイヤー 9 `FlowTrails` を軌跡専用に使う（残像用カメラの描画対象）。
+- シェーダーは `Resources/` 配下に置くことでビルド時のストリップを避けている。
+
+**Editor で最初に確認する点**: 残像が流れと逆方向（上下逆）に流れる場合、`FlowFeedback.shader` の
+uv→world 変換の y 符号がプラットフォームで反転している。`(uv - 0.5)` の y を反転して直す。
+
+### Standalone ビルド
+
+Editor メニュー `Flow/Build macOS` または `Flow/Build Windows`。出力は `Builds/`（git 管理外）。
+コマンドライン: `-executeMethod StandaloneBuilder.BuildMac`。
+
 ### 検証状況（重要）
 
 このコンテナには Unity Editor バイナリが無く、コンパイル・実行・実機確認は一切できていない。

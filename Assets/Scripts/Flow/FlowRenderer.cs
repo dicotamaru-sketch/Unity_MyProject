@@ -7,14 +7,15 @@ namespace FlowGame
     {
         public Color CoolColor = new Color(0.35f, 0.55f, 0.95f);
         public Color WarmColor = new Color(1f, 0.75f, 0.35f);
-        public float BaseAlpha = 0.85f;
+        public float BaseIntensity = 0.9f;
+        public float GlowBoost = 4f;
         public float NodeDiameter = 0.62f;
 
         private FlowSimulation simulation;
         private Mesh mesh;
 
         private Vector3[] vertices;
-        private Color32[] colors;
+        private Vector2[] uvs;
         private int[] indices;
 
         private SpriteRenderer[] nodeRings;
@@ -30,9 +31,15 @@ namespace FlowGame
             GetComponent<MeshFilter>().mesh = mesh;
 
             var mr = GetComponent<MeshRenderer>();
-            var mat = new Material(Shader.Find("Sprites/Default"));
+            var mat = new Material(Shader.Find("Flow/Trail"));
+            mat.SetColor("_CoolColor", CoolColor);
+            mat.SetColor("_WarmColor", WarmColor);
+            mat.SetFloat("_BaseIntensity", BaseIntensity);
+            mat.SetFloat("_GlowBoost", GlowBoost);
             mr.material = mat;
             mr.sortingOrder = 1;
+            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            mr.receiveShadows = false;
 
             BuildNodeMarkers();
         }
@@ -89,7 +96,7 @@ namespace FlowGame
             if (vertices == null || vertices.Length != vertCount)
             {
                 vertices = new Vector3[vertCount];
-                colors = new Color32[vertCount];
+                uvs = new Vector2[vertCount];
                 indices = new int[vertCount];
                 for (int k = 0; k < vertCount; k++) indices[k] = k;
             }
@@ -102,31 +109,23 @@ namespace FlowGame
                 {
                     Vector2 a = simulation.GetTrailPoint(p, s);
                     Vector2 b = simulation.GetTrailPoint(p, s + 1);
-                    float ageA = (float)s / segsPerParticle;
-                    float ageB = (float)(s + 1) / segsPerParticle;
+                    float fadeA = 1f - (float)s / segsPerParticle;
+                    float fadeB = 1f - (float)(s + 1) / segsPerParticle;
 
                     vertices[vi] = a;
-                    colors[vi] = TrailColor(ageA, glow);
+                    uvs[vi] = new Vector2(glow, fadeA);
                     vi++;
                     vertices[vi] = b;
-                    colors[vi] = TrailColor(ageB, glow);
+                    uvs[vi] = new Vector2(glow, fadeB);
                     vi++;
                 }
             }
 
             mesh.Clear();
             mesh.vertices = vertices;
-            mesh.colors32 = colors;
+            mesh.uv = uvs;
             mesh.SetIndices(indices, MeshTopology.Lines, 0);
             mesh.RecalculateBounds();
-        }
-
-        private Color32 TrailColor(float ageT, float glow)
-        {
-            float alpha = Mathf.Lerp(1f, 0f, ageT) * BaseAlpha;
-            Color c = Color.Lerp(CoolColor, WarmColor, glow);
-            c.a = alpha;
-            return c;
         }
 
         private void UpdateNodeMarkers()
